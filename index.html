@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #131722;
+            --panel-bg: #1E222D;
+            --text-color: #D1D4DC;
+            --accent-color: #2962FF;
+            --border-color: #2A2E39;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar styling */
+        #sidebar {
+            width: 250px;
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .category-title {
+            padding: 15px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            color: #787B86;
+            font-weight: bold;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #181C25;
+        }
+
+        .ticker-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            padding: 12px 20px;
+            text-align: left;
+            width: 100%;
+            cursor: pointer;
+            font-size: 1em;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        .ticker-btn:hover, .ticker-btn.active {
+            background-color: var(--border-color);
+            color: #fff;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 16px;
+        }
+
+        /* Chart container styling */
+        #main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tradingview-widget-container {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            #sidebar {
+                width: 100%;
+                height: 150px;
+                flex-direction: row;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                flex-wrap: nowrap;
+            }
+            .category-title {
+                display: none; /* Hide categories on mobile to save space */
+            }
+            .ticker-btn {
+                width: auto;
+                border-bottom: none;
+                border-right: 1px solid var(--border-color);
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        </div>
+
+    <div id="main-content">
+        <div class="tradingview-widget-container" id="tv_chart_container"></div>
+    </div>
+
+    <script src="config.js"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    
+    <script>
+        let widget = null;
+
+        // Function to load a specific ticker into the chart
+        function loadChart(symbol) {
+            // Highlight active button
+            document.querySelectorAll('.ticker-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${symbol.replace(':', '-')}`).classList.add('active');
+
+            if (widget !== null) {
+                widget.remove(); // Clear previous widget
+            }
+
+            widget = new TradingView.widget({
+                "autosize": true,
+                "symbol": symbol,
+                "interval": "D",
+                "timezone": "Etc/UTC",
+                "theme": "dark",
+                "style": "1",
+                "locale": "en",
+                "enable_publishing": false,
+                "backgroundColor": "#131722",
+                "gridColor": "#2a2e39",
+                "hide_top_toolbar": false,
+                "hide_legend": false,
+                "save_image": false,
+                "container_id": "tv_chart_container",
+                // Adding basic moving averages. 
+                "studies": [
+                    "MASimple@tv-basicstudies", 
+                    "MAExp@tv-basicstudies"
+                ]
+            });
+        }
+
+        // Function to build the sidebar menu from config.js
+        function initializeMenu() {
+            const sidebar = document.getElementById('sidebar');
+            let isFirstTicker = true;
+
+            for (const [category, tickers] of Object.entries(marketConfig.watchlists)) {
+                // Add Category Header
+                const catHeader = document.createElement('div');
+                catHeader.className = 'category-title';
+                catHeader.innerText = category;
+                sidebar.appendChild(catHeader);
+
+                // Add Ticker Buttons
+                tickers.forEach(symbol => {
+                    const btn = document.createElement('button');
+                    btn.className = 'ticker-btn';
+                    btn.id = `btn-${symbol.replace(':', '-')}`;
+                    
+                    // Clean up string (e.g., turn "NASDAQ:NVDA" into "NVDA")
+                    const cleanName = symbol.split(':')[1] || symbol;
+                    btn.innerText = cleanName;
+                    
+                    btn.onclick = () => loadChart(symbol);
+                    sidebar.appendChild(btn);
+
+                    // Load the very first ticker automatically
+                    if (isFirstTicker) {
+                        loadChart(symbol);
+                        isFirstTicker = false;
+                    }
+                });
+            }
+        }
+
+        // Start the app
+        initializeMenu();
+    </script>
+</body>
+</html>
