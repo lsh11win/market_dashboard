@@ -2,20 +2,20 @@
 const marketConfig = {
     watchlists: {
         "US ETFs & Bonds": [
-            "AMEX:SPY", 
-            "AMEX:QQQ", 
-            "AMEX:IWM",
-            "AMEX:TLT"
+            "SPY", 
+            "QQQ", 
+            "IWM",
+            "TLT"
         ],
         "Trend Setters": [
-            "NASDAQ:NVDA", 
-            "NASDAQ:META", 
-            "NASDAQ:MSFT"
+            "NVDA", 
+            "META", 
+            "MSFT"
         ],
         "Crypto": [
-            "BINANCE:BTCUSDT", 
-            "BINANCE:ETHUSDT",
-            "BINANCE:SOLUSDT"
+            "BTCUSDT", 
+            "ETHUSDT",
+            "SOLUSDT"
         ]
     }
 };
