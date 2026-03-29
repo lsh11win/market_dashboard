@@ -142,12 +142,16 @@
                 "container_id": "tv_chart_container",
                 // Adding basic moving averages. 
                 "studies": [
-                    "MASimple@tv-basicstudies", 
-                    "MAExp@tv-basicstudies"
+                    "Moving Average@tv-basicstudies",   // EMA8  (default is Exponential)
+                    "Moving Average@tv-basicstudies",   // EMA21
+                    "Moving Average@tv-basicstudies",   // SMA50
+                    "Moving Average@tv-basicstudies"    // SMA200
                 ],
                 "studies_overrides": {
-              "moving average.length": 8,        // 1st MA = EMA 8
-              "moving average_1.length": 21     // 2nd MA = EMA 21
+                    "moving average.length": 8,        // 1st MA = EMA 8
+                    "moving average_1.length": 21,     // 2nd MA = EMA 21
+                    "moving average_2.length": 50,     // 3rd MA = SMA 50
+                    "moving average_3.length": 200     // 4th MA = SMA 200
             }
             });
         }
